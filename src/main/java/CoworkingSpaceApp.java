@@ -10,14 +10,14 @@ public class CoworkingSpaceApp {
     private static boolean isAdmin = false;
 
     public static void main(String[] args) {
-        initializeSampleData();
-        runApplication();
-    }
+        try {
+            Workspace.loadFromFile();
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+            System.out.println("Starting with empty workspace list.");
+        }
 
-    private static void initializeSampleData() {
-        Workspace.addWorkspace(1, "Private Office", 25.0);
-        Workspace.addWorkspace(2, "Open Space", 15.0);
-        Workspace.addWorkspace(3, "Meeting Room", 40.0);
+        runApplication();
     }
 
     private static void runApplication() {
@@ -39,6 +39,7 @@ public class CoworkingSpaceApp {
             case 1 -> adminLogin();
             case 2 -> userLogin();
             case 3 -> {
+                Workspace.saveToFile();
                 System.out.println("Thank you for using the system. Goodbye!");
                 System.exit(0);
             }
