@@ -6,6 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class Workspace {
     private static final String FILE_PATH = "workspaces.txt";
@@ -81,9 +83,9 @@ public class Workspace {
     }
 
     public static void addWorkspace(int id, String type, double price) {
-        if (findById(id) != null) {
-            throw new IllegalArgumentException("Workspace ID already exists");
-        }
+        findById(id).ifPresent(ws -> {
+            throw new IllegalArgumentException("Workspace ID " + id + " already exists");
+        });
         workspaces.add(new Workspace(id, type, price));
     }
 
@@ -91,11 +93,12 @@ public class Workspace {
         workspaces.removeIf(ws -> ws.id == id);
     }
 
-    public static Workspace findById(int id) {
+    public static Optional<Workspace> findById(int id) {
+        System.out.println("Searching for ID: " + id + " in: " +
+                workspaces.stream().map(Workspace::getId).collect(Collectors.toList()));
         return workspaces.stream()
-                .filter(ws -> ws.id == id)
-                .findFirst()
-                .orElse(null);
+                .filter(ws -> ws.getId() == id)
+                .findFirst();
     }
 
     public static List<Workspace> getAllWorkspaces() {

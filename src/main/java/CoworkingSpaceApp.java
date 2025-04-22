@@ -130,7 +130,7 @@ public class CoworkingSpaceApp {
         System.out.println("\n=== Add New Workspace ===");
         int id = getIntInput("Enter workspace ID: ", 1, Integer.MAX_VALUE);
 
-        if (Workspace.findById(id) != null) {
+        if (Workspace.findById(id).isPresent()) {
             System.out.println("Workspace ID already exists.");
             return;
         }
