@@ -22,9 +22,11 @@ public class Reservation {
     public LocalDate getDate() { return date; }
 
     public static Reservation create(String username, int workspaceId, LocalDate date) {
-        Workspace ws = Workspace.findById(workspaceId);
-        if (ws == null || !ws.isAvailable()) {
-            throw new IllegalArgumentException("Invalid or unavailable workspace");
+        Workspace ws = Workspace.findById(workspaceId)
+                .orElseThrow(() -> new IllegalArgumentException("Workspace not found"));
+
+        if (!ws.isAvailable()) {
+            throw new IllegalArgumentException("Workspace is already booked");
         }
 
         if (hasConflict(workspaceId, date)) {
@@ -37,6 +39,7 @@ public class Reservation {
         int newId = userReservations.size() + 1;
         Reservation reservation = new Reservation(newId, workspaceId, username, date);
         userReservations.add(reservation);
+
         ws.setAvailable(false);
 
         return reservation;
@@ -65,8 +68,8 @@ public class Reservation {
 
         userReservations.removeIf(res -> {
             if (res.id == reservationId) {
-                Workspace ws = Workspace.findById(res.workspaceId);
-                if (ws != null) ws.setAvailable(true);
+                Workspace.findById(res.workspaceId)
+                        .ifPresent(ws -> ws.setAvailable(true));
                 return true;
             }
             return false;
